@@ -1,0 +1,459 @@
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.geom.*;
+
+public class StockDashboard_Clean extends JFrame {
+    
+    private static final Color PRIMARY_BLUE = new Color(0, 102, 204);
+    private static final Color BG_LIGHT = new Color(248, 249, 250);
+    private static final Color TEXT_PRIMARY = new Color(31, 41, 55);
+    private static final Color TEXT_SECONDARY = new Color(107, 114, 128);
+    private static final Color BORDER_LIGHT = new Color(229, 231, 235);
+    private static final Color GREEN = new Color(16, 185, 129);
+    private static final Color RED = new Color(239, 68, 68);
+    private static final Color BLACK_CHART = new Color(20, 20, 20);
+    
+    public StockDashboard_Clean() {
+        setTitle("Scott's Stock Indexes - Investment Dashboard");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1200, 800);
+        setLocationRelativeTo(null);
+        setResizable(true);
+        setVisible(true);
+        
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(createHeader(), BorderLayout.NORTH);
+        mainPanel.add(createContent(), BorderLayout.CENTER);
+        
+        add(mainPanel);
+    }
+    
+    private JPanel createHeader() {
+        JPanel header = new JPanel();
+        header.setBackground(Color.WHITE);
+        header.setBorder(new MatteBorder(0, 0, 1, 0, BORDER_LIGHT));
+        header.setLayout(new FlowLayout(FlowLayout.LEFT, 24, 16));
+        
+        JLabel logo = new JLabel("Scott's Stock Indexes");
+        logo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        logo.setForeground(TEXT_PRIMARY);
+        
+        JLabel subtitle = new JLabel("  |  Personal Investment Portfolio Dashboard");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        subtitle.setForeground(TEXT_SECONDARY);
+        
+        header.add(logo);
+        header.add(subtitle);
+        
+        return header;
+    }
+    
+    private JTabbedPane createContent() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.setBackground(BG_LIGHT);
+        
+        tabs.addTab("Overview", createOverviewTab());
+        tabs.addTab("Holdings", createHoldingsTab());
+        tabs.addTab("Relevant News", createNewsTab());
+        tabs.addTab("Analysis", createAnalysisTab());
+        
+        return tabs;
+    }
+    
+    private JPanel createOverviewTab() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(BG_LIGHT);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JPanel summaryRow = new JPanel();
+        summaryRow.setLayout(new GridLayout(1, 5, 12, 0));
+        summaryRow.setBackground(BG_LIGHT);
+        summaryRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        
+        summaryRow.add(createCard("Portfolio Value", "$427,850", GREEN));
+        summaryRow.add(createYTDCard("NVDA YTD Change", "+18.5%", GREEN));
+        summaryRow.add(createYTDCard("AMD YTD Change", "+24.3%", GREEN));
+        summaryRow.add(createYTDCard("CRWD YTD Change", "+12.8%", GREEN));
+        summaryRow.add(createYTDCard("PLTR YTD Change", "+31.2%", GREEN));
+        
+        panel.add(summaryRow);
+        panel.add(Box.createVerticalStrut(20));
+        
+        JPanel holdingsSection = new JPanel();
+        holdingsSection.setLayout(new BoxLayout(holdingsSection, BoxLayout.Y_AXIS));
+        holdingsSection.setBackground(Color.WHITE);
+        holdingsSection.setBorder(new CompoundBorder(
+            new LineBorder(BORDER_LIGHT),
+            new EmptyBorder(20, 20, 20, 20)
+        ));
+        
+        JLabel holdingsTitle = new JLabel("Current Holdings");
+        holdingsTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        holdingsTitle.setForeground(TEXT_PRIMARY);
+        holdingsSection.add(holdingsTitle);
+        holdingsSection.add(Box.createVerticalStrut(15));
+        
+        String[][] holdings = {
+            {"NVDA", "NVIDIA Corp.", "$156,200", "+18.5%"},
+            {"AMD", "Advanced Micro", "$98,450", "+24.3%"},
+            {"CRWD", "CrowdStrike", "$87,230", "+12.8%"},
+            {"PLTR", "Palantir Tech", "$85,970", "+31.2%"}
+        };
+        
+        for (String[] h : holdings) {
+            holdingsSection.add(createHoldingRow(h));
+            holdingsSection.add(Box.createVerticalStrut(10));
+        }
+        
+        panel.add(holdingsSection);
+        panel.add(Box.createVerticalGlue());
+        
+        JScrollPane scroll = new JScrollPane(panel);
+        scroll.setBackground(BG_LIGHT);
+        
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(scroll);
+        return wrapper;
+    }
+    
+    private JPanel createCard(String title, String value, Color color) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(new CompoundBorder(
+            new LineBorder(BORDER_LIGHT),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+        
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        titleLabel.setForeground(TEXT_SECONDARY);
+        
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        valueLabel.setForeground(color);
+        
+        card.add(titleLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(valueLabel);
+        
+        return card;
+    }
+    
+    private JPanel createYTDCard(String title, String value, Color color) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(new CompoundBorder(
+            new LineBorder(BORDER_LIGHT),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+        
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        titleLabel.setForeground(TEXT_SECONDARY);
+        
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        valueLabel.setForeground(color);
+        
+        card.add(titleLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(valueLabel);
+        
+        return card;
+    }
+    
+    private JPanel createHoldingRow(String[] data) {
+        JPanel row = new JPanel();
+        row.setLayout(new GridLayout(1, 4, 12, 0));
+        row.setBackground(new Color(249, 250, 251));
+        row.setBorder(new EmptyBorder(8, 8, 8, 8));
+        
+        JLabel ticker = new JLabel(data[0]);
+        ticker.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        ticker.setForeground(TEXT_PRIMARY);
+        
+        JLabel company = new JLabel(data[1]);
+        company.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        company.setForeground(TEXT_SECONDARY);
+        
+        JLabel value = new JLabel(data[2]);
+        value.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        value.setForeground(TEXT_PRIMARY);
+        
+        JLabel change = new JLabel(data[3]);
+        change.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        change.setForeground(data[3].startsWith("+") ? GREEN : RED);
+        
+        row.add(ticker);
+        row.add(company);
+        row.add(value);
+        row.add(change);
+        
+        return row;
+    }
+    
+    private JPanel createHoldingsTab() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BG_LIGHT);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JLabel title = new JLabel("Holdings Performance Chart");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setForeground(TEXT_PRIMARY);
+        
+        JPanel chartPanel = createPerformanceChart();
+        
+        panel.add(title, BorderLayout.NORTH);
+        panel.add(Box.createVerticalStrut(15), BorderLayout.NORTH);
+        panel.add(chartPanel, BorderLayout.CENTER);
+        
+        return panel;
+    }
+    
+    private JPanel createPerformanceChart() {
+        return new JPanel() {
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                int width = getWidth();
+                int height = getHeight();
+                int padding = 60;
+                int chartWidth = width - (padding * 2);
+                int chartHeight = height - (padding * 2);
+                
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, 0, width, height);
+                
+                g2d.setColor(BLACK_CHART);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawLine(padding, padding, padding, height - padding);
+                g2d.drawLine(padding, height - padding, width - padding, height - padding);
+                
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2d.setColor(TEXT_SECONDARY);
+                g2d.drawString("YTD Performance Comparison", padding, 30);
+                
+                String[] labels = {"NVDA", "AMD", "CRWD", "PLTR", "SPY", "Portfolio"};
+                double[] values = {18.5, 24.3, 12.8, 31.2, 13.2, 21.7};
+                Color[] colors = {new Color(0, 100, 200), new Color(100, 0, 200), new Color(0, 150, 100), new Color(200, 100, 0), new Color(150, 150, 150), BLACK_CHART};
+                
+                int barWidth = chartWidth / (labels.length + 1);
+                int maxValue = 35;
+                
+                for (int i = 0; i < labels.length; i++) {
+                    int barHeight = (int)((values[i] / maxValue) * chartHeight);
+                    int x = padding + (i * barWidth) + (barWidth / 4);
+                    int y = height - padding - barHeight;
+                    
+                    g2d.setColor(colors[i]);
+                    g2d.fillRect(x, y, barWidth / 2, barHeight);
+                    
+                    g2d.setColor(BLACK_CHART);
+                    g2d.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                    g2d.drawString(labels[i], x, height - padding + 20);
+                    
+                    g2d.setFont(new Font("Segoe UI", Font.BOLD, 10));
+                    g2d.drawString(values[i] + "%", x - 5, y - 5);
+                }
+                
+                g2d.setColor(TEXT_SECONDARY);
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                g2d.drawString("% Gain", 10, padding - 10);
+                
+                drawLegend(g2d, width - 200, padding, labels, colors);
+            }
+            
+            private void drawLegend(Graphics2D g2d, int x, int y, String[] labels, Color[] colors) {
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 10));
+                g2d.setColor(TEXT_PRIMARY);
+                g2d.drawString("Legend:", x, y);
+                
+                for (int i = 0; i < labels.length; i++) {
+                    g2d.setColor(colors[i]);
+                    g2d.fillRect(x, y + 15 + (i * 18), 12, 12);
+                    
+                    g2d.setColor(TEXT_PRIMARY);
+                    g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                    g2d.drawString(labels[i], x + 18, y + 24 + (i * 18));
+                }
+            }
+        };
+    }
+    
+    private JPanel createNewsTab() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(BG_LIGHT);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JLabel title = new JLabel("Relevant Market News (Last 2 Weeks)");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setForeground(TEXT_PRIMARY);
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(20));
+        
+        panel.add(createNewsCard(
+            "AI Chip Rally Continues",
+            "NVIDIA and AMD stocks surge as demand for AI chips remains strong. Enterprise data centers continue massive investments in GPU infrastructure. NVIDIA leads with +18.5% YTD while AMD follows at +24.3%.",
+            "TechCrunch / Seeking Alpha"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createNewsCard(
+            "Cybersecurity Stocks Show Resilience",
+            "CrowdStrike reports strong quarterly earnings with increased enterprise adoption. Cloud security spending accelerates as companies prioritize ransomware protection. CRWD up +12.8% YTD.",
+            "Wall Street Journal / Yahoo Finance"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createNewsCard(
+            "Palantir Reaches New All-Time Highs",
+            "PLTR government contracts expand to international markets. Company reports record AI-powered analytics deployments. Stock surges +31.2% YTD on strong growth trajectory and government demand.",
+            "Reuters / Bloomberg"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createNewsCard(
+            "S&P 500 Reaches Record Levels",
+            "Broader market (SPY) gains +13.2% YTD driven by AI optimism and earnings resilience. Fed rate environment supports equity valuations. Technology sector leads market performance.",
+            "CNBC / MarketWatch"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createNewsCard(
+            "Your Portfolio Outperforms Market",
+            "Your Scott's Stock Indexes portfolio is up +21.7% YTD, significantly outperforming the S&P 500 (+13.2%). Strong positioning in AI and cybersecurity sectors driving outperformance.",
+            "Personal Analytics Dashboard"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createNewsCard(
+            "AI Investment Boom Continues",
+            "Enterprise spending on AI infrastructure reaches all-time highs. Estimates suggest $500B+ in AI-related capex for 2025. Hardware and software stocks benefit from accelerating adoption cycle.",
+            "Fortune / Technology News Daily"
+        ));
+        
+        panel.add(Box.createVerticalGlue());
+        
+        JScrollPane scroll = new JScrollPane(panel);
+        scroll.setBackground(BG_LIGHT);
+        
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(scroll);
+        return wrapper;
+    }
+    
+    private JPanel createNewsCard(String headline, String content, String source) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(new CompoundBorder(
+            new LineBorder(BORDER_LIGHT),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+        
+        JLabel headlineLabel = new JLabel(headline);
+        headlineLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        headlineLabel.setForeground(TEXT_PRIMARY);
+        
+        JLabel contentLabel = new JLabel("<html>" + content + "</html>");
+        contentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        contentLabel.setForeground(TEXT_SECONDARY);
+        
+        JLabel sourceLabel = new JLabel("Source: " + source);
+        sourceLabel.setFont(new Font("Segoe UI", Font.ITALIC, 10));
+        sourceLabel.setForeground(new Color(150, 150, 150));
+        
+        card.add(headlineLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(contentLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(sourceLabel);
+        
+        return card;
+    }
+    
+    private JPanel createAnalysisTab() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(BG_LIGHT);
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JLabel title = new JLabel("Portfolio Analysis");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setForeground(TEXT_PRIMARY);
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(20));
+        
+        panel.add(createAnalysisCard(
+            "Sector Breakdown",
+            "Semiconductors: 54% (NVDA, AMD) | Cybersecurity: 20% (CRWD) | Enterprise Software: 20% (PLTR) | Cash/Other: 6%"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createAnalysisCard(
+            "Key Strengths",
+            "• Strong AI exposure capturing chip demand boom\n" +
+            "• Diversified across complementary tech sectors\n" +
+            "• All holdings posting double-digit YTD gains\n" +
+            "• Outperforming S&P 500 by 8.5 percentage points"
+        ));
+        panel.add(Box.createVerticalStrut(12));
+        
+        panel.add(createAnalysisCard(
+            "Risk Considerations",
+            "• High concentration in tech sector\n" +
+            "• Exposed to AI bubble sentiment risks\n" +
+            "• Semiconductor cycle volatility\n" +
+            "• Consider diversifying into other sectors for balance"
+        ));
+        
+        panel.add(Box.createVerticalGlue());
+        
+        JScrollPane scroll = new JScrollPane(panel);
+        scroll.setBackground(BG_LIGHT);
+        
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(scroll);
+        return wrapper;
+    }
+    
+    private JPanel createAnalysisCard(String title, String content) {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(new CompoundBorder(
+            new LineBorder(BORDER_LIGHT),
+            new EmptyBorder(16, 16, 16, 16)
+        ));
+        
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        
+        JLabel contentLabel = new JLabel("<html>" + content.replace("\n", "<br>") + "</html>");
+        contentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        contentLabel.setForeground(TEXT_SECONDARY);
+        
+        card.add(titleLabel);
+        card.add(Box.createVerticalStrut(8));
+        card.add(contentLabel);
+        
+        return card;
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new StockDashboard_Clean();
+            }
+        });
+    }
+}
